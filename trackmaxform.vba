@@ -1935,7 +1935,7 @@ Private Sub AutofillTxtItemAmount(occItem As ContentControl)
             occPayment.Type = wdContentControlDropdownList
     End If
     
-    'Checking to make sure they have not filled in an amount, the payment type matches the default, and is not blank.
+    'Checking to make sure they have not filled in an amount, the payment type matches the default, is not blank, and default amount is not blank.
     If IsPlaceholder(occAmount) _
     And Not IsPlaceholder(occPayment) _
     And occPayment.Range.Text = occDefaultPayment.Range.Text _
