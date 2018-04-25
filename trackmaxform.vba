@@ -17,7 +17,7 @@
 ' ------------------------------------------------------------------------------
 ' TrackmaxForm.vba
 ' Christopher Ryan Bauer
-' Version 0.1.0
+' Version 1.0.1
 '
 ' This document is used for an employee to request a new rebate program be
 ' created or modified. When distributed to employees protection needs to be
@@ -624,13 +624,13 @@ End Sub
 
 Private Sub appEvents_DocumentBeforeSave(ByVal Doc As Document, SaveAsUI As Boolean, Cancel As Boolean)
     If SaveAsUI Then
+      Cancel = True
+      
       With Dialogs(wdDialogFileSaveAs)
         .Name = ActiveDocument.Path & "\" & strSaveName
         .Format = Word.WdSaveFormat.wdFormatXMLDocumentMacroEnabled
         .Show
       End With
-      
-      Cancel = True
     End If
 End Sub
 
@@ -1031,7 +1031,7 @@ Private Sub UpdateTitle(Optional blnForceUpdate As Boolean = False)
             strTitle = ""
             strCaption = "Incomplete Program Request"
         Else
-            strTitle = strCategory & ": " & strDescription & " (" & strBuyer & "-" & strPayment & ")"
+            strTitle = strCategory & "- " & strDescription & " (" & strBuyer & "-" & strPayment & ")"
             strCaption = strTitle
         End If
             
@@ -1935,10 +1935,11 @@ Private Sub AutofillTxtItemAmount(occItem As ContentControl)
             occPayment.Type = wdContentControlDropdownList
     End If
     
-    'Checking to make sure they have not filled in an amount, the payment type matches the default, and is not blank.
+    'Checking to make sure they have not filled in an amount, the payment type matches the default, is not blank, and default amount is not blank.
     If IsPlaceholder(occAmount) _
     And Not IsPlaceholder(occPayment) _
-    And occPayment.Range.Text = occDefaultPayment.Range.Text Then
+    And occPayment.Range.Text = occDefaultPayment.Range.Text _
+    And Not IsPlaceholder(occDefaultAmount) Then
             occAmount.Range.Text = occDefaultAmount.Range.Text
     End If
 End Sub
@@ -2031,6 +2032,7 @@ Private Function CheckTxtItemAmount(occItemAmount As ContentControl) As Boolean
     intAccessPayment = AccessIndex(intRow, 3, tblSection.Rows.Count, 3)
     enuPayment = GetEnumAmountFormatValue(Left(tblSection.Rows(intRow).Cells(3).Range.ContentControls(intAccessPayment).Range.Text, 1))
     
+    If enuPayment = RationalNumber Then: enuPayment = Cash
     If Not ValidateAmount(occItemAmount, enuPayment) Then
         CheckTxtItemAmount = False
         Exit Function
